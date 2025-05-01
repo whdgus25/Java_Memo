@@ -21,7 +21,8 @@ public class MemoApp {
             System.out.println("2. 저장된 메모 목록 보기");
             System.out.println("3. 메모 열어보기");
             System.out.println("4. 메모 수정하기");
-            System.out.println("5. 프로그램 종료");
+            System.out.println("5. 메모 삭제하기");
+            System.out.println("6. 프로그램 종료");
             System.out.println("메뉴를 선택하세요 : ");
 
             int choice;
@@ -55,6 +56,11 @@ public class MemoApp {
                     editeMemo(scanner, memoFolder);
                     break;
                 case 5:
+                    System.out.println("메모 삭제하기 기능 실행...");
+                    // TODO : 메모 삭제하기 기능 실행
+                    deleteMemo(scanner, memoFolder);
+                    break;
+                case 6:
                     System.out.println("프로그램을 종료합니다.");
                     scanner.close();
                     return;
@@ -224,6 +230,45 @@ public class MemoApp {
             System.out.println("메모가 수정되었습니다.");
         } catch (IOException e) {
             System.out.println("파일 저장 중 오류 발생 : " + e.getMessage());
+        }
+    }
+
+    // 5번 기능
+    private static void deleteMemo(Scanner scanner, File memoFolder) {
+        File[] memoFiles = memoFolder.listFiles((dir, name) -> name.endsWith(".txt"));
+
+        if (memoFiles == null || memoFiles.length == 0) {
+            System.out.println("저장된 메모가 없습니다.");
+            return;
+        }
+
+        // 목록 출력
+        System.out.println("\n 저장된 메모 목록 : ");
+        for (int i = 0; i < memoFiles.length; i++) {
+            System.out.println((i + 1) + ". " + memoFiles[i].getName());
+        }
+
+        System.out.println("삭제할 메모 번호를 입력하세요.");
+        int index;
+        try {
+            index = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("숫자를 입력하세요!");
+            return;
+        }
+
+        if (index < 1 || index > memoFiles.length) {
+            System.out.println("유효한 번호를 입력하세요!");
+            return;
+        }
+
+        File selectedFile = memoFiles [index - 1];
+
+        // 파일 삭제
+        if (selectedFile.delete()) {
+            System.out.println("메모가 삭제되었습니다." + selectedFile.getName());
+        } else {
+            System.out.println("메모 삭제 중 오류 박생.");
         }
     }
 }
