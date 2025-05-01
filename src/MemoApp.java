@@ -10,20 +10,20 @@ public class MemoApp {
         File memoFolder = new File("./memo");
 
         // 메모 저장 폴더 없으면 생성
-        if (!memoFolder.exists()) {
-            memoFolder.mkdir();
-        }
+        // if (!memoFolder.exists()) { memoFolder.mkdir();}
+        memoFolder.mkdirs();
+
 
         // 프로그램이 종료될 때까지 반봅
         while (true) {
-            System.out.println("\n 간단한 메모장");
-            System.out.println("1. 새 메모 작성");
-            System.out.println("2. 저장된 메모 목록 보기");
-            System.out.println("3. 메모 열어보기");
-            System.out.println("4. 메모 수정하기");
-            System.out.println("5. 메모 삭제하기");
-            System.out.println("6. 프로그램 종료");
-            System.out.println("메뉴를 선택하세요 : ");
+            System.out.println("\n 메모장 프로그램");
+            System.out.println("1. 메모 작성");
+            System.out.println("2. 메모 목록");
+            System.out.println("3. 메모 열기");
+            System.out.println("4. 메모 수정");
+            System.out.println("5. 메모 삭제");
+            System.out.println("6. 메모 검색");
+            System.out.println("메뉴 선택 : ");
 
             int choice;
 
@@ -35,37 +35,17 @@ public class MemoApp {
             }
 
             switch (choice) {
-                case 1:
-                    System.out.println("새 메모 작성 기능 실행...");
-                    // TODO: 새 메모 작성 기능 추가하기
-                    writeNewMemo(scanner, memoFolder);
-                    break;
-                case 2:
-                    System.out.println("저장된 메모 목록 보기 기능 실행...");
-                    // TODO : 메모 목록 보기 기능 추가하기
-                    showMemoList(memoFolder);
-                    break;
-                case 3:
-                    System.out.println("메모 열어보기 기능 실행...");
-                    // TODO : 메모 열어보기 기능 실행
-                    openMemo(scanner, memoFolder);
-                    break;
-                case 4:
-                    System.out.println("메모 수정하기 기능 실행...");
-                    // TODO : 메모 수정하기 기능 실행
-                    editeMemo(scanner, memoFolder);
-                    break;
-                case 5:
-                    System.out.println("메모 삭제하기 기능 실행...");
-                    // TODO : 메모 삭제하기 기능 실행
-                    deleteMemo(scanner, memoFolder);
-                    break;
-                case 6:
+                case 1 -> writeNewMemo(scanner, memoFolder);
+                case 2 -> showMemoList(memoFolder);
+                case 3 -> openMemo(scanner, memoFolder);
+                case 4 -> editeMemo(scanner, memoFolder);
+                case 5 -> deleteMemo(scanner, memoFolder);
+                case 6 -> searchMemo(scanner, memoFolder);
+                case 0 -> {
                     System.out.println("프로그램을 종료합니다.");
-                    scanner.close();
                     return;
-                default:
-                    System.out.println("올바른 번호를 입력하세요.");
+                }
+                default -> System.out.println("잘못된 입력입니다.");
             }
         }
     }
@@ -271,4 +251,51 @@ public class MemoApp {
             System.out.println("메모 삭제 중 오류 박생.");
         }
     }
+
+    // 6번 기능
+    private static void searchMemo(Scanner scanner, File memoFolder) {
+        System.out.println("\n 검색할 키워드를 입력하세요 : ");
+
+        String keyword = scanner.nextLine();
+
+        File[] memoFiles = memoFolder.listFiles((dir, name) -> name.endsWith(".txt"));
+
+        if (memoFiles == null || memoFiles.length == 0) {
+            System.out.println("저장된 메모가 없습니다.");
+            return;
+        }
+
+        boolean found = false;
+
+        System.out.println("\n 검색 결과 : ");
+        for (File file : memoFiles) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                StringBuilder content = new StringBuilder();
+
+                String line;
+                boolean matched = false;
+
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append("\n");
+                    if (line.contains(keyword)) {
+                        matched = true;
+                    }
+                }
+
+                if (matched) {
+                    found = true;
+                    System.out.println("파일 : " + file.getName());
+                    System.out.println("내용 일부 : \n" + content.toString().substring(0, Math.min(100, content.length())));
+                    System.out.println("-----------------------------------------------------");
+                }
+
+            } catch (IOException e) {
+                System.out.println("파일 읽기 오류 : " + file.getName());
+            }
+        }
+        if (!found) {
+            System.out.println("해당 키워드가 포함한 메모가 없습니다.");
+        }
+    }
+
 }
